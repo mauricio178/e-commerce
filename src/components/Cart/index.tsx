@@ -1,37 +1,47 @@
-// Scripts
-import {useState} from 'react'
-import {useQuery} from 'react-query'
-
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 // Components
 import Button from '@material-ui/core/Button'
 
 // Styles
-import {Wrapper} from '../Item/item.styles'
+import { Wrapper } from './cart.styles'
 
 //Types
-import { CartItem } from '../../App'
+import { CartItemProps } from '../../App'
+import CartItem from '../CartItem'
 
 type Props = {
-    item: CartItem;
-    handleAddToCart: (clickedItem: CartItem) => void
+  cartItems: CartItemProps[];
+  addToCart: (clickedItem: CartItemProps) => void
+  removeFromCart: (id: number) => void
 }
 
+const Cart: React.FC<Props> = ({ cartItems, addToCart, removeFromCart }) => {
 
-const Cart: React.FC<Props> = ({item, handleAddToCart}) => {
-
+  const calculateTotal = (items: CartItemProps[]) =>
+    items.reduce((ack: number, item) => ack + item.amount * item.price, 0);
+  
 
   return (
     <Wrapper>
-     <img src={item.image} alt={item.title}/>
-     <div>
-         <h3>{item.title}</h3>
-         <p>{item.description}</p>
-         <h3> 'R$': {item.price}</h3>
-     </div>
+      <h2>Your Shopping Cart</h2>
 
-     <Button onClick={() => handleAddToCart(item)}>
-         Add To CArt
-     </Button>
+      {
+        cartItems.length === 0 ?
+          <p>No items on cart.</p>
+          :
+          <>
+          {cartItems.map(item => (
+            <CartItem 
+              key={item.id}
+              item={item}
+              addToCart={addToCart}
+              removeFromCart={removeFromCart}
+            />
+          ))}
+          </>
+      }
+
+      <h2>Total: $:{calculateTotal(cartItems).toFixed(2)}</h2>
     </Wrapper>
   );
 }
